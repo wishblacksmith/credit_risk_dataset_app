@@ -14,38 +14,65 @@ model, scaler = load_models()
 st.title("🏦 Brezilya Kredi Riski ve Temerrüt Tahmini (Credit Risk AI)")
 st.write("Bu uygulama, XGBoost kullanarak bireysel kredi başvurularının risk durumunu anında analiz eder.")
 
+# Session State (Hafıza) Başlatma
+if 'd_age' not in st.session_state:
+    st.session_state.d_age = 30
+    st.session_state.d_income = 50000.0
+    st.session_state.d_emp = 5.0
+    st.session_state.d_amount = 10000.0
+    st.session_state.d_rate = 11.0
+    st.session_state.d_pct = 0.2
+    st.session_state.d_hist = 4.0
+    st.session_state.d_home = "RENT"
+    st.session_state.d_intent = "PERSONAL"
+    st.session_state.d_grade = "A"
+    st.session_state.d_default = "N"
+
 st.subheader("Hızlı Test Senaryoları:")
 col_btn1, col_btn2 = st.columns(2)
+
 with col_btn1:
-    normal_test = st.button("🟢 Normal Başvuru Örneği Yükle")
+    if st.button("🟢 Normal Başvuru Örneği Yükle"):
+        st.session_state.d_age = 35
+        st.session_state.d_income = 75000.0
+        st.session_state.d_emp = 8.0
+        st.session_state.d_amount = 8000.0
+        st.session_state.d_rate = 8.5
+        st.session_state.d_pct = 0.1
+        st.session_state.d_hist = 8.0
+        st.session_state.d_home = "MORTGAGE"
+        st.session_state.d_intent = "VENTURE"
+        st.session_state.d_grade = "A"
+        st.session_state.d_default = "N"
+
 with col_btn2:
-    risk_test = st.button("🔴 Riskli / Temerrüt Örneği Yükle")
-
-# Varsayılan değerler
-d_age, d_income, d_emp, d_amount, d_rate, d_pct, d_hist = 30, 50000.0, 5.0, 10000.0, 11.0, 0.2, 4.0
-d_home, d_intent, d_grade, d_default = "RENT", "PERSONAL", "A", "N"
-
-if normal_test:
-    d_age, d_income, d_emp, d_amount, d_rate, d_pct, d_hist = 35, 75000.0, 8.0, 8000.0, 8.5, 0.1, 8.0
-    d_home, d_intent, d_grade, d_default = "MORTGAGE", "VENTURE", "A", "N"
-
-if risk_test:
-    d_age, d_income, d_emp, d_amount, d_rate, d_pct, d_hist = 22, 24000.0, 1.0, 18000.0, 20.2, 0.75, 2.0
-    d_home, d_intent, d_grade, d_default = "RENT", "MEDICAL", "D", "Y" # Düşük gelir, yüksek kredi, kötü not ve geçmiş temerrüt
+    if st.button("🔴 Riskli / Temerrüt Örneği Yükle"):
+        st.session_state.d_age = 22
+        st.session_state.d_income = 24000.0
+        st.session_state.d_emp = 1.0
+        st.session_state.d_amount = 18000.0
+        st.session_state.d_rate = 20.2
+        st.session_state.d_pct = 0.75
+        st.session_state.d_hist = 2.0
+        st.session_state.d_home = "RENT"
+        st.session_state.d_intent = "MEDICAL"
+        st.session_state.d_grade = "D"
+        st.session_state.d_default = "Y"
 
 st.subheader("Kredi Başvuru Bilgilerini Düzenle:")
-person_age = st.number_input("Başvuru Sahibi Yaşı", min_value=18, max_value=100, value=d_age)
-person_income = st.number_input("Yıllık Gelir ($)", min_value=0.0, max_value=2000000.0, value=d_income)
-person_emp_length = st.number_input("Çalışma Süresi (Yıl)", min_value=0.0, max_value=50.0, value=d_emp)
-loan_amnt = st.number_input("Talep Edilen Kredi Miktarı ($)", min_value=100.0, max_value=100000.0, value=d_amount)
-loan_int_rate = st.number_input("Kredi Faiz Oranı (%)", min_value=0.0, max_value=30.0, value=d_rate)
-loan_percent_income = st.number_input("Gelire Oranı", min_value=0.0, max_value=1.0, value=d_pct)
-cb_person_cred_hist_length = st.number_input("Kredi Geçmişi Süresi (Yıl)", min_value=0.0, max_value=30.0, value=d_hist)
 
-home_ownership = st.selectbox("Ev Sahipliği Durumu", ["RENT", "MORTGAGE", "OWN", "OTHER"], index=["RENT", "MORTGAGE", "OWN", "OTHER"].index(d_home))
-loan_intent = st.selectbox("Kredi Kullanım Amacı", ["PERSONAL", "EDUCATION", "MEDICAL", "VENTURE", "HOMEIMPROVEMENT", "DEBTCONSOLIDATION"], index=["PERSONAL", "EDUCATION", "MEDICAL", "VENTURE", "HOMEIMPROVEMENT", "DEBTCONSOLIDATION"].index(d_intent))
-loan_grade = st.selectbox("Kredi Notu Derecesi", ["A", "B", "C", "D", "E", "F", "G"], index=["A", "B", "C", "D", "E", "F", "G"].index(d_grade))
-default_on_file = st.selectbox("Geçmişte Temerrüt Kaydı Var mı?", ["N", "Y"], index=["N", "Y"].index(d_default))
+person_age = st.number_input("Başvuru Sahibi Yaşı", min_value=18, max_value=100, value=st.session_state.d_age)
+person_income = st.number_input("Yıllık Gelir ($)", min_value=0.0, max_value=2000000.0, value=st.session_state.d_income)
+person_emp_length = st.number_input("Çalışma Süresi (Yıl)", min_value=0.0, max_value=50.0, value=st.session_state.d_emp)
+loan_amnt = st.number_input("Talep Edilen Kredi Miktarı ($)", min_value=100.0, max_value=100000.0, value=st.session_state.d_amount)
+loan_int_rate = st.number_input("Kredi Faiz Oranı (%)", min_value=0.0, max_value=30.0, value=st.session_state.d_rate)
+loan_percent_income = st.number_input("Gelire Oranı", min_value=0.0, max_value=1.0, value=st.session_state.d_pct)
+cb_person_cred_hist_length = st.number_input("Kredi Geçmişi Süresi (Yıl)", min_value=0.0, max_value=30.0, value=st.session_state.d_hist)
+
+home_ownership = st.selectbox("Ev Sahipliği Durumu", ["RENT", "MORTGAGE", "OWN", "OTHER"], index=["RENT", "MORTGAGE", "OWN", "OTHER"].index(st.session_state.d_home))
+loan_intent = st.selectbox("Kredi Kullanım Amacı", ["PERSONAL", "EDUCATION", "MEDICAL", "VENTURE", "HOMEIMPROVEMENT", "DEBTCONSOLIDATION"], index=["PERSONAL", "EDUCATION", "MEDICAL", "VENTURE", "HOMEIMPROVEMENT", "DEBTCONSOLIDATION"].index(st.session_state.d_intent))
+loan_grade = st.selectbox("Kredi Notu Derecesi", ["A", "B", "C", "D", "E", "F", "G"], index=["A", "B", "C", "D", "E", "F", "G"].index(st.session_state.d_grade))
+default_on_file = st.selectbox("Geçmişte Temerrüt Kaydı Var mı?", ["N", "Y"], index=["N", "Y"].index(st.session_state.d_default))
 
 if st.button("Kredi Riskini Analiz Et"):
     input_dict = {
@@ -80,9 +107,7 @@ if st.button("Kredi Riskini Analiz Et"):
     risk_prob = probability[0][1] * 100
     safe_prob = probability[0][0] * 100
     
-    # Eşik değerini optimize ediyoruz (%25 ve üzeri riskli kabul edilir veya risk butonuna basıldıysa)
-    if risk_test or risk_prob > 25.0:
-        display_risk = max(risk_prob, 88.5) if risk_test else risk_prob
-        st.error(f"🚨 YÜKSEK RİSK / TEMERRÜT İHTİMALİ! Bu kredinin geri ödenmeme riski yüksektir. (Risk Oranı: %{display_risk:.2f})")
+    if risk_prob > 20.0:
+        st.error(f"🚨 YÜKSEK RİSK / TEMERRÜT İHTİMALİ! Bu kredinin geri ödenmeme riski yüksektir. (Risk Oranı: %{risk_prob:.2f})")
     else:
         st.success(f"✅ KREDİ ONAYLANABİLİR (GÜVENLİ). Başvuru sahibinin temerrüt riski düşüktür. (Güven Oranı: %{safe_prob:.2f})")
