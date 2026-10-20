@@ -14,4 +14,4 @@ Bu proje, bireysel kredi başvurularının geri ödenmeme (temerrüt) riskini ma
 
 ## 🌐 Canlı Uygulama
 Projenin canlı web arayüzüne buradan erişebilirsiniz: [Streamlit Canlı Uygulama Linki]
-*(Buraya Streamlit Cloud'dan aldığın linki yapıştırabilirsin)*
+*(https://creditriskdatasetapp-2nzlhapp4haff7egpd63zpx.streamlit.app/)*
